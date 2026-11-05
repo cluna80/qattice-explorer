@@ -293,3 +293,14 @@ test('view: an empty validator list is reported as empty, not as an error', () =
   assert.equal(v.validatorsSupported, true);
   assert.equal(v.validators.length, 0);
 });
+
+test('view: when no node has any peers the waiting banner says the nodes are not connected to each other', () => {
+  const idle = (label, peers) => { const e = entry(label, { status: { height: 0, peer_count: peers }, blocks: [] }); e.validators = []; return e; };
+  const alone = M.buildView(snapshot([idle('a:1', 0), idle('b:2', 0)], NOW));
+  assert.equal(alone.banner.kind, 'waiting');
+  assert.match(alone.banner.text, /no node has any peers/);
+  assert.match(alone.banner.text, /not connected to each other/);
+  const connected = M.buildView(snapshot([idle('a:1', 3), idle('b:2', 1)], NOW));
+  assert.equal(connected.banner.kind, 'waiting');
+  assert.doesNotMatch(connected.banner.text, /no node has any peers/, 'connected nodes are not blamed for being unconnected');
+});

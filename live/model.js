@@ -252,7 +252,11 @@
     if (rows.length === 0) banner = { kind: 'offline', text: 'No nodes configured' };
     else if (pending) banner = { kind: 'loading', text: 'Connecting to nodes…' };
     else if (!answering.length) banner = { kind: 'offline', text: 'Node offline' };
-    else if (answering.every((r) => r.status.height === 0)) banner = { kind: 'waiting', text: 'Nodes answer, but they have not produced a block yet (height 0)' };
+    else if (answering.every((r) => r.status.height === 0)) {
+      const unconnected = answering.every((r) => r.status.peerCount === 0);
+      banner = { kind: 'waiting', text: 'Nodes answer, but they have not produced a block yet (height 0)' +
+        (unconnected ? '; no node has any peers, so they are not connected to each other' : '') };
+    }
     else if (online.length === 0) banner = { kind: 'stale', text: 'Nodes answer but no new blocks are arriving (stale)' };
     else if (online.length < rows.length) banner = { kind: 'partial', text: online.length + ' of ' + rows.length + ' nodes online' };
     else banner = { kind: 'ok', text: rows.length + ' of ' + rows.length + ' nodes online' };

@@ -35,23 +35,32 @@ no data directory: starting again restarts the chain from genesis.
 * On Windows, if `devnet-stop.sh` leaves a node: `tasklist | findstr chain-forge-node`, then `taskkill /PID <pid> /F`.
 
 ## Height stays at 0 (the API answers, but no block is produced)
-This was seen on the first BossKing run: all four nodes answered `/api/status` with `height 0`, `/api/blocks` was empty and `/api/validators`
-returned no validators for more than 20 seconds, while the same start in a Linux sandbox reached height 4 within about 12 seconds. The Explorer
-reports this as *"Nodes answer, but they have not produced a block yet (height 0)"* and `live-check.js` fails with a message saying so.
-The API being up only proves the process started; consensus needs the four nodes to find each other and vote. **Cause not yet established.**
-Collect, in this order:
-```bash
-ls -la /c/Dev/cf-target2/debug/chain-forge-node.exe                 # when was this binary built? is it from the commit you meant?
-tail -n 40 ~/.qattice-devnet/logs/alice.log                          # the bootstrap node: any error, panic, or "waiting for peers"?
-tail -n 40 ~/.qattice-devnet/logs/bob.log
-curl -s http://127.0.0.1:19080/api/status; echo                      # peer_count: 0 or 1 means the nodes did not connect
-curl -s http://127.0.0.1:19081/api/status; echo
-```
-**Baseline comparison (decisive):** stop this devnet (`scripts/devnet-stop.sh`) and run the repository's own script on the same binary:
-`cd /c/Dev/qattice-main-wt && BIN=/c/Dev/cf-target2/debug/chain-forge-node.exe ./tests/devnet/run_4node_devnet.sh --timeout 90 --target-height 3`.
-If that also stalls, the cause is the node build or the Windows environment, not these scripts. If it reaches height 3, the difference is in how
-`devnet-start.sh` launches the nodes.
-Unverified suspects, to check against the logs (not conclusions): the binary is not the freshly built `main` one; the Windows firewall prompt for
-the new executable is waiting for an answer; Git Bash converting the `--bootstrap /ip4/...` argument (which starts with `/`) into a Windows path
-(`MSYS_NO_PATHCONV=1` disables that conversion; the repository's own script has the same argument); startup order or timing on this machine.
+**Cause (established by measurement): the nodes must be started in order.** The node dials its `--bootstrap` address once at startup and
+apparently does not retry (this is the roadmap's open "P2P reconnection" item). If the other nodes start before alice is listening, they
+never connect: the API answers, `peer_count` stays `0`, the log ends at "node ready -- waiting for transactions and blocks", and no block is
+ever produced. mDNS "discovered peer" lines in the log do **not** mean a connection exists.
 
+| How the four nodes were started (Linux sandbox, same binary, same genesis) | Connected and producing blocks |
+|---|---|
+| all four at once, as `tests/devnet/run_4node_devnet.sh` does (25 s window) | 2 of 5 |
+| all four at once, my own harness (24 s window) | 2 of 6 (one needed 16 s) |
+| alice first, wait for her API, then the others 1 s apart | **6 of 6**, in about 7 s |
+| `scripts/devnet-start.sh` (staggered) | **6 of 6** reported connected |
+
+The first BossKing run (all four started at once; `peer_count: 0` on both nodes inspected; logs full of mDNS discoveries and no connection) is
+consistent with this. It was **not** shown to be Windows-specific: the same stall reproduces on Linux. Git Bash rewriting the
+`--bootstrap /ip4/...` argument into a Windows path was my first suspicion; it is **not needed to explain** the stall, and I have no evidence
+it happens. `devnet-start.sh` still guards against it (it disables the rewriting and passes Windows-style paths via `cygpath`), which is
+harmless, but that guard is untested on Windows.
+
+`scripts/devnet-start.sh` therefore starts alice, waits for her API, starts the others one second apart, and then waits until a node reports
+`peer_count > 0`. If that does not happen within 30 s it exits `3` with a warning instead of claiming success. The Explorer says
+"Nodes answer, but they have not produced a block yet (height 0); no node has any peers, so they are not connected to each other" when it sees this.
+If you start the nodes some other way: start the first node, wait until `curl http://127.0.0.1:19080/api/status` answers, then start the rest.
+
+If it still stalls, collect:
+```bash
+ls -la /c/Dev/cf-target2/debug/chain-forge-node.exe          # when was the binary built?
+tail -n 40 ~/.qattice-devnet/logs/alice.log ; tail -n 40 ~/.qattice-devnet/logs/bob.log
+curl -s http://127.0.0.1:19081/api/status ; echo             # peer_count
+```
