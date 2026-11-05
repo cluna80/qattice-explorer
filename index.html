@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qattice Explorer</title>
+<meta name="description" content="Explore the Qattice Layer-1 blockchain dashboard and sample devnet records.">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#040517;color:#f8f7ff;font:16px system-ui,sans-serif}.viewport{overflow:auto}.dashboard{position:relative;min-width:1080px}.dashboard img{display:block;width:100%;height:auto}.zone{position:absolute;background:none;border:1px solid transparent;color:transparent;padding:0;border-radius:8px;cursor:pointer}.zone:hover{border-color:#9268ff;background:#8446ff15}.zone:focus-visible{outline:3px solid #41e9ff;outline-offset:-3px}.zone[aria-current=true]{border-color:#ab71ff;background:#793aff20}dialog{width:min(850px,calc(100% - 24px));max-height:85vh;background:#0a1026;color:inherit;border:1px solid #6548bc;border-radius:16px;padding:0;box-shadow:0 0 55px #6627ed55}dialog::backdrop{background:#030414b5;backdrop-filter:blur(4px)}header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(120deg,#221445,#0d1c38)}h1{font-size:22px;margin:0}button,input{font:inherit}button{cursor:pointer}.close,.result{color:inherit;background:#151834;border:1px solid #453881;border-radius:8px;padding:8px 13px}.content{padding:20px 24px}.muted{color:#b8b4d2;font-size:13px;margin:0 0 16px}.search{width:100%;color:inherit;background:#05091a;border:1px solid #6548bc;border-radius:8px;padding:12px;margin-bottom:14px}.result{display:flex;width:100%;text-align:left;justify-content:space-between;gap:12px;margin:7px 0}.result:hover,.result:focus-visible{border-color:#28dbff}.result small{color:#33e8f6}.table{overflow:auto}dl{display:grid;grid-template-columns:minmax(120px,1fr) 2fr;margin:0}dt,dd{padding:10px;border-bottom:1px solid #29274d;margin:0;overflow-wrap:anywhere}.back{margin-bottom:12px}
+</style>
+<body>
+<main class="viewport" aria-label="Qattice Explorer">
+<div class="dashboard" id="board"><img src="dashboard.png" width="1672" height="941" alt="Qattice Explorer dashboard. Sample chain height 1,284,337, finality 2.31 seconds, 256 active validators and four online devnet nodes."></div>
+</main>
+<dialog id="panel" aria-labelledby="title"><header><h1 id="title"></h1><form method="dialog"><button class="close" aria-label="Close panel">×</button></form></header><div class="content"><p class="muted">Qattice Devnet · Reference snapshot · Sample data</p><div id="body"></div></div></dialog>
+<script src="explorer.js"></script>
+</body>
+</html>
