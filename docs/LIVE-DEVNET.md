@@ -48,10 +48,12 @@ ever produced. mDNS "discovered peer" lines in the log do **not** mean a connect
 | `scripts/devnet-start.sh` (staggered) | **6 of 6** reported connected |
 
 The first BossKing run (all four started at once; `peer_count: 0` on both nodes inspected; logs full of mDNS discoveries and no connection) is
-consistent with this. It was **not** shown to be Windows-specific: the same stall reproduces on Linux. Git Bash rewriting the
-`--bootstrap /ip4/...` argument into a Windows path was my first suspicion; it is **not needed to explain** the stall, and I have no evidence
-it happens. `devnet-start.sh` still guards against it (it disables the rewriting and passes Windows-style paths via `cygpath`), which is
-harmless, but that guard is untested on Windows.
+consistent with this. It was **not** shown to be Windows-specific: the same stall reproduces on Linux, where no path rewriting exists.
+Git Bash rewriting the `--bootstrap /ip4/...` argument into a Windows path was my first suspicion. It is **not the cause** of the stall
+(the start-order race is, and the race reproduces without it). The rewriting itself is **real**: Git Bash rewrites arguments that start with `/`
+when it launches a native `.exe` (shown with `whoami /user`). An earlier version of this page said there was no evidence it happens;
+that was too strong. So the guard in `devnet-start.sh` (it disables the rewriting and passes Windows-style paths via `cygpath`) is kept
+as a real precaution, though it has not been exercised against this node on Windows. See `ROADMAP.md`, "Four-node startup failure: correction".
 
 `scripts/devnet-start.sh` therefore starts alice, waits for her API, starts the others one second apart, and then waits until a node reports
 `peer_count > 0`. If that does not happen within 30 s it exits `3` with a warning instead of claiming success. The Explorer says
