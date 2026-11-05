@@ -1,0 +1,1 @@
+{"chain_id":"qcb-devnet-4node-mldsa","environment":"testnet","height":9,"peer_count":3,"state_root":"a92a28fed791f2c03bb88f7899807e131fc9e38729164c2abd86d4c11013e08e","engine_version":"0.1.0","is_running":true,"attestation_quorum":3,"attestation_cap_per_window":3,"insecure_dev_identity_overrides":false,"local_peer_id":"12D3KooWMS6xgw3aYoYH9cfmA6Q3nm4zu5fKPrvh9zF2Cdtu5y5w"}
