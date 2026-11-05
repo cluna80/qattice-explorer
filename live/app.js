@@ -96,6 +96,7 @@
     if (vt) {
       if (!view.anyLive) vt.replaceChildren(el(doc, 'p', 'No node is answering.', 'empty'));
       else if (!view.validatorsSupported) vt.replaceChildren(el(doc, 'p', 'The node did not return a usable /api/validators list.', 'empty'));
+      else if (!view.validators.length) vt.replaceChildren(el(doc, 'p', 'The node reports no validators yet.', 'empty'));
       else vt.replaceChildren(table(doc, ['Validator', 'Voting power', 'PoP verified', 'Status', 'Bonded', 'Missed'], view.validators.map((v) => [v.id, v.power, v.popVerified, v.status, v.bonded, v.missed])));
     }
 

@@ -262,3 +262,34 @@ test('age formatting', () => {
   assert.equal(M.fmtAge(3 * 3600000 + 5 * 60000), '3h 5m ago');
   assert.equal(M.fmtAge(-1), '—');
 });
+
+// ── a chain that has not produced a block must not read as healthy (found on the first Windows run) ────────────────────
+
+test('view: nodes that answer at height 0 with no blocks are "waiting for the first block", not healthy', () => {
+  const idle = (label) => {
+    const e = entry(label, { status: { height: 0 }, blocks: [] });
+    e.validators = []; e.validatorStatus = [];
+    return e;
+  };
+  const v = M.buildView(snapshot([idle('a:1'), idle('b:2'), idle('c:3'), idle('d:4')], NOW));
+  assert.equal(v.banner.kind, 'waiting');
+  assert.match(v.banner.text, /have not produced a block yet \(height 0\)/);
+  assert.doesNotMatch(v.banner.text, /nodes online/, 'it must not claim "N of N nodes online"');
+  assert.equal(v.metrics.find((m) => m.key === 'latest').value, '—');
+  assert.equal(v.blocks.length, 0);
+});
+
+test('view: once any node has a block the normal states apply again', () => {
+  const idle = entry('a:1', { status: { height: 0 }, blocks: [] });
+  const live = entry('b:2', { status: { height: 3 } });
+  const v = M.buildView(snapshot([idle, live], NOW));
+  assert.notEqual(v.banner.kind, 'waiting');
+});
+
+test('view: an empty validator list is reported as empty, not as an error', () => {
+  const e = entry('a:1', { status: { height: 0 }, blocks: [] });
+  e.validators = [];
+  const v = M.buildView(snapshot([e], NOW));
+  assert.equal(v.validatorsSupported, true);
+  assert.equal(v.validators.length, 0);
+});

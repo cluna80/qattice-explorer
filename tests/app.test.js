@@ -107,3 +107,14 @@ test('configuration: URL beats saved beats defaults; invalid entries are reporte
   assert.equal(A.readConfig('?interval=5', null).intervalMs, 5000);
   for (const bad of ['0', '0.2', '61', 'abc', '-3']) assert.equal(A.readConfig('?interval=' + bad, null).intervalMs, M.POLL_MS, bad);
 });
+
+test('page: "waiting for the first block" is shown as such, with the validators panel saying the list is empty', () => {
+  const doc = new FakeDoc(PAGE_IDS);
+  const e = liveEntry('127.0.0.1:19080', { height: 0 });
+  e.blocks = []; e.validators = []; e.validatorStatus = [];
+  A.render(doc, view([e]));
+  assert.equal(doc.getElementById('banner').getAttribute('data-state'), 'waiting');
+  assert.match(doc.getElementById('banner').textContent, /have not produced a block yet/);
+  assert.match(doc.getElementById('blocks').textContent, /has not produced a block yet/);
+  assert.match(doc.getElementById('validators').textContent, /reports no validators yet/);
+});

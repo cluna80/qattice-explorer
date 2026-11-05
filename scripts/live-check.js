@@ -59,9 +59,13 @@ async function main() {
     if (!answering.length) failures.push('no node answered');
     const grew = answering.map((n) => ({ label: n.label, from: first[n.label], to: n.status.height }));
     for (const g of grew) if (g.to - g.from < o.minNew) failures.push(g.label + ' advanced only ' + (g.to - g.from) + ' block(s) (' + g.from + ' -> ' + g.to + '), needed ' + o.minNew);
+    if (answering.length && answering.every((n) => n.status.height === 0)) {
+      failures.push('every node answers but none has produced a block (height 0): the API is up while consensus has not started. Check the node logs and the peer counts above (0 or 1 peers means the nodes did not connect); see docs/LIVE-DEVNET.md, "Height stays at 0".');
+    }
     if (answering.length >= 2 && v.consensus.agreement.kind !== 'agree') failures.push('nodes do not agree: ' + v.consensus.agreement.text);
     if (v.blocks[0] && v.blocks[0].height < Math.max(...answering.map((n) => n.status.height)) - 2) failures.push('newest displayed block is far behind the node height');
-    console.log('\nHeight progression: ' + grew.map((g) => g.label + ' ' + g.from + '->' + g.to).join(', '));
+    console.log('\nPeers per node (as each node reports): ' + answering.map((n) => n.label + '=' + n.status.peerCount).join(', '));
+    console.log('Height progression: ' + grew.map((g) => g.label + ' ' + g.from + '->' + g.to).join(', '));
     console.log('Newest block shown: ' + (v.blocks[0] ? v.blocks[0].heightText + ' hash ' + v.blocks[0].hash + ' proposer ' + v.blocks[0].proposer : 'none'));
     console.log('Agreement: ' + v.consensus.agreement.text);
     console.log('Chain: ' + v.chain.chainId + ' / ' + v.chain.environment + ' / ' + v.chain.engineVersion);

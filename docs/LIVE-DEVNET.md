@@ -33,3 +33,25 @@ no data directory: starting again restarts the chain from genesis.
   must be served over `http://` (not `file://`) and the nodes must be plain `http`.
 * A node's log is `~/.qattice-devnet/logs/<name>.log`.
 * On Windows, if `devnet-stop.sh` leaves a node: `tasklist | findstr chain-forge-node`, then `taskkill /PID <pid> /F`.
+
+## Height stays at 0 (the API answers, but no block is produced)
+This was seen on the first BossKing run: all four nodes answered `/api/status` with `height 0`, `/api/blocks` was empty and `/api/validators`
+returned no validators for more than 20 seconds, while the same start in a Linux sandbox reached height 4 within about 12 seconds. The Explorer
+reports this as *"Nodes answer, but they have not produced a block yet (height 0)"* and `live-check.js` fails with a message saying so.
+The API being up only proves the process started; consensus needs the four nodes to find each other and vote. **Cause not yet established.**
+Collect, in this order:
+```bash
+ls -la /c/Dev/cf-target2/debug/chain-forge-node.exe                 # when was this binary built? is it from the commit you meant?
+tail -n 40 ~/.qattice-devnet/logs/alice.log                          # the bootstrap node: any error, panic, or "waiting for peers"?
+tail -n 40 ~/.qattice-devnet/logs/bob.log
+curl -s http://127.0.0.1:19080/api/status; echo                      # peer_count: 0 or 1 means the nodes did not connect
+curl -s http://127.0.0.1:19081/api/status; echo
+```
+**Baseline comparison (decisive):** stop this devnet (`scripts/devnet-stop.sh`) and run the repository's own script on the same binary:
+`cd /c/Dev/qattice-main-wt && BIN=/c/Dev/cf-target2/debug/chain-forge-node.exe ./tests/devnet/run_4node_devnet.sh --timeout 90 --target-height 3`.
+If that also stalls, the cause is the node build or the Windows environment, not these scripts. If it reaches height 3, the difference is in how
+`devnet-start.sh` launches the nodes.
+Unverified suspects, to check against the logs (not conclusions): the binary is not the freshly built `main` one; the Windows firewall prompt for
+the new executable is waiting for an answer; Git Bash converting the `--bootstrap /ip4/...` argument (which starts with `/`) into a Windows path
+(`MSYS_NO_PATHCONV=1` disables that conversion; the repository's own script has the same argument); startup order or timing on this machine.
+
