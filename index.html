@@ -1,17 +1,68 @@
 <!doctype html>
 <html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Qattice Explorer</title>
-<meta name="description" content="Explore the Qattice Layer-1 blockchain dashboard and sample devnet records.">
-<style>
-*{box-sizing:border-box}body{margin:0;background:#040517;color:#f8f7ff;font:16px system-ui,sans-serif}.viewport{overflow:auto}.dashboard{position:relative;min-width:1080px}.dashboard img{display:block;width:100%;height:auto}.zone{position:absolute;background:none;border:1px solid transparent;color:transparent;padding:0;border-radius:8px;cursor:pointer}.zone:hover{border-color:#9268ff;background:#8446ff15}.zone:focus-visible{outline:3px solid #41e9ff;outline-offset:-3px}.zone[aria-current=true]{border-color:#ab71ff;background:#793aff20}dialog{width:min(850px,calc(100% - 24px));max-height:85vh;background:#0a1026;color:inherit;border:1px solid #6548bc;border-radius:16px;padding:0;box-shadow:0 0 55px #6627ed55}dialog::backdrop{background:#030414b5;backdrop-filter:blur(4px)}header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;background:linear-gradient(120deg,#221445,#0d1c38)}h1{font-size:22px;margin:0}button,input{font:inherit}button{cursor:pointer}.close,.result{color:inherit;background:#151834;border:1px solid #453881;border-radius:8px;padding:8px 13px}.content{padding:20px 24px}.muted{color:#b8b4d2;font-size:13px;margin:0 0 16px}.search{width:100%;color:inherit;background:#05091a;border:1px solid #6548bc;border-radius:8px;padding:12px;margin-bottom:14px}.result{display:flex;width:100%;text-align:left;justify-content:space-between;gap:12px;margin:7px 0}.result:hover,.result:focus-visible{border-color:#28dbff}.result small{color:#33e8f6}.table{overflow:auto}dl{display:grid;grid-template-columns:minmax(120px,1fr) 2fr;margin:0}dt,dd{padding:10px;border-bottom:1px solid #29274d;margin:0;overflow-wrap:anywhere}.back{margin-bottom:12px}
-</style>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src http:; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Qattice Explorer — live</title>
+<meta name="description" content="Read-only live view of a Qattice devnet, taken from the nodes' HTTP API. No sample data.">
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
-<main class="viewport" aria-label="Qattice Explorer">
-<div class="dashboard" id="board"><img src="dashboard.png" width="1672" height="941" alt="Qattice Explorer dashboard. Sample chain height 1,284,337, finality 2.31 seconds, 256 active validators and four online devnet nodes."></div>
-</main>
-<dialog id="panel" aria-labelledby="title"><header><h1 id="title"></h1><form method="dialog"><button class="close" aria-label="Close panel">×</button></form></header><div class="content"><p class="muted">Qattice Devnet · Reference snapshot · Sample data</p><div id="body"></div></div></dialog>
-<script src="explorer.js"></script>
+<div id="app" class="shell">
+  <aside class="side" aria-label="Sections">
+    <div class="brand"><span class="logo">QATT</span><span class="brand-text"><strong>Qattice Explorer</strong><small>Live devnet view</small></span></div>
+    <nav>
+      <a href="#metrics" class="active">Dashboard</a>
+      <a href="#blocks-panel">Blocks</a>
+      <a href="#validators-panel">Validators</a>
+      <a href="#consensus-panel">Consensus</a>
+      <a href="#nodes-panel">Network</a>
+      <a href="#chain-panel">Chain Info</a>
+      <a href="#unsupported-panel">Not provided</a>
+    </nav>
+    <section class="chain-box" id="chain-panel"><h2>Chain Info</h2><div id="chain"></div></section>
+    <p class="fine"><a href="reference.html">Reference mockup (sample data, not live)</a></p>
+  </aside>
+  <main>
+    <header class="top">
+      <div><h1>Qattice Explorer</h1><p class="sub">Read-only. Everything below comes from the nodes' HTTP API, or is marked as not provided.</p></div>
+      <div class="top-actions"><span id="updated" class="updated">Not live</span><button id="open-settings" class="btn" type="button">Nodes…</button></div>
+    </header>
+    <div id="banner" class="banner loading" role="status" aria-live="polite" data-state="loading">Connecting to nodes…</div>
+    <section id="metrics" class="metrics" aria-label="Live metrics"></section>
+    <div class="row one">
+      <section class="panel" id="nodes-panel"><h2>Network Overview <small>per node, straight from each node's /api/status</small></h2><div id="nodes" class="scroll"></div></section>
+    </div>
+    <div class="row two wide">
+      <section class="panel" id="consensus-panel"><h2>Consensus Observatory</h2><div id="consensus"></div></section>
+      <section class="panel" id="blocks-panel"><h2>Block Stream <small>latest finalized, from the primary node</small></h2><div id="blocks" class="scroll"></div></section>
+    </div>
+    <div class="row two">
+      <section class="panel" id="validators-panel"><h2>Validators</h2><div id="validators" class="scroll"></div></section>
+      <section class="panel" id="unsupported-panel"><h2>Not provided by the node API</h2><div id="unsupported" class="cards"></div></section>
+    </div>
+    <footer class="foot">Read-only: this page only sends GET requests to <code>/api/status</code>, <code>/api/blocks</code>, <code>/api/blocks/{height}</code>, <code>/api/validators</code>, <code>/api/validators/status</code> and <code>/api/peers</code>. It never submits transactions and never reads identity or key data.</footer>
+  </main>
+</div>
+
+<dialog id="settings" aria-labelledby="settings-title">
+  <form id="settings-form">
+    <h2 id="settings-title">Node addresses</h2>
+    <p class="note">Comma-separated <code>host:port</code> list (plain http). Default development nodes: 127.0.0.1:19080 – 19083. Saved in this browser only. You can also use <code>?nodes=127.0.0.1:19080,127.0.0.1:19081</code> in the URL.</p>
+    <input id="nodes-input" class="field" type="text" aria-label="Node addresses" autocomplete="off" spellcheck="false">
+    <p id="config-errors" class="err" role="alert"></p>
+    <div class="actions"><button class="btn" type="submit">Save and reconnect</button><button class="btn ghost" type="button" id="close-settings">Cancel</button></div>
+  </form>
+</dialog>
+
+<dialog id="detail" aria-labelledby="detail-title">
+  <header class="dlg-head"><h2 id="detail-title">Block</h2><form method="dialog"><button class="btn ghost" aria-label="Close">×</button></form></header>
+  <div id="detail-body" class="dlg-body"></div>
+</dialog>
+
+<script src="live/model.js"></script>
+<script src="live/poller.js"></script>
+<script src="live/app.js"></script>
 </body>
 </html>
