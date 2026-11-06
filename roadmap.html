@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="description" content="The Qattice public network rollout roadmap: foundation, PQ-HotStuff, private and public testnets, mainnet and ecosystem expansion.">
+<title>Network Rollout Roadmap — Qattice Explorer</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.roadmap-hero{padding:32px 28px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(125deg,#21144d,#0b1836 75%);margin-bottom:20px}
+.eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);font-weight:700}
+.roadmap-hero h1{font-size:clamp(26px,4vw,42px);margin:10px 0}.roadmap-hero p{max-width:780px;color:#d2cdeb}
+.phase-list{display:grid;gap:15px}.phase{display:grid;grid-template-columns:58px minmax(0,1fr);gap:15px;padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--panel)}.phase-index{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#251a58;color:var(--cyan);font-size:20px;font-weight:800}
+.phase h2{margin:0 0 6px;font-size:19px}.phase p{margin:8px 0;color:var(--muted)}.phase .detail{font-size:13px}.phase-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.phase-tag{border:1px solid #514b7b;border-radius:100px;padding:3px 10px;font-size:11px;color:#e3ddff}.phase-tag.done{color:#b9ffd9;border-color:#277d54;background:#0b2a1e}.phase-tag.active{color:#ffe9a8;border-color:#8a6d12;background:#2d2508}
+.roadmap-table{width:100%;border-collapse:collapse;font-size:13px}.roadmap-table th,.roadmap-table td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}.roadmap-table th{color:var(--cyan)}.roadmap-table td:first-child{font-weight:700}.table-scroll{overflow-x:auto}
+.roadmap-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.roadmap-links a{display:inline-block;border:1px solid #5a4a91;border-radius:10px;padding:9px 13px;text-decoration:none;color:#e7e1ff}.roadmap-links a:hover,.roadmap-links a:focus-visible{border-color:var(--cyan);color:var(--cyan)}
+@media(max-width:560px){.phase{grid-template-columns:1fr}.roadmap-hero{padding:22px 18px}.roadmap-table{min-width:640px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side" aria-label="Sections">
+<div class="brand"><span class="logo">QATT</span><span class="brand-text"><strong>Qattice Explorer</strong><small>Network roadmap</small></span></div>
+<nav>
+<a href="index.html">Dashboard</a>
+<a href="index.html#blocks-panel">Blocks</a>
+<a href="index.html#validators-panel">Validators</a>
+<a href="index.html#nodes-panel">Network</a>
+<a href="roadmap.html" class="active" aria-current="page">Network Rollout</a>
+<a href="https://github.com/cluna80/qattice-explorer/blob/feat/explorer-live-devnet/ROADMAP.md">Explorer Roadmap</a>
+</nav>
+<p class="fine">Public launch stages are proposals until the corresponding engineering gates are approved. No mainnet launch date is announced.</p>
+</aside>
+<main>
+<header class="top"><div><h1>Qattice Network Rollout</h1><p class="sub">A transparent path from foundation to public participation.</p></div></header>
+<section class="roadmap-hero">
+<div class="eyebrow">Public launch roadmap · November 2026</div>
+<h1>Building a sovereign network, one verified phase at a time.</h1>
+<p>Follow Qattice from foundational development through post-quantum consensus, testnets and mainnet. Milestones are released when acceptance criteria pass—not on speculative dates.</p>
+<div class="roadmap-links"><a href="#phases">Explore phases</a><a href="#participate">How you can participate</a><a href="https://github.com/cluna80/Qattice/blob/main/ROADMAP.md">Engineering roadmap</a></div>
+</section>
+<section class="panel" style="margin-bottom:16px"><h2>Where we are today</h2><p>Phase 0 foundational acceptance is complete. Security hardening and signing-v2 integration are being validated in draft pull requests. Four-node signing-v2 tests have passed, but this is <strong>not</strong> a PQ-HotStuff network. PQ-HotStuff, public testnet and mainnet remain future milestones.</p><p class="note">Status describes engineering evidence, not public availability. Draft changes are not automatically merged or deployed.</p></section>
+<section id="phases" aria-label="Rollout phases" class="phase-list">
+<article class="phase"><div class="phase-index">0</div><div><div class="phase-head"><h2>Blockchain Foundation</h2><span class="phase-tag done">Foundational acceptance complete</span></div><p>Core chain infrastructure, wallet and identity foundations, transaction execution, cryptographic validation and private multi-node testing.</p><p class="detail">Security hardening and integration work continue beyond the original Phase 0 closeout.</p></div></article>
+<article class="phase"><div class="phase-index">1</div><div><div class="phase-head"><h2>Security &amp; PQ-HotStuff Integration</h2><span class="phase-tag active">Current / upcoming</span></div><p>Complete signing-v2 integration and hardening. Implement PQ-HotStuff safety rules, quorum certificates, validator membership and reliable recovery.</p><p class="detail">Exit gate: independently reproducible private-network consensus and security evidence.</p></div></article>
+<article class="phase"><div class="phase-index">2</div><div><div class="phase-head"><h2>Private PQ-HotStuff Testnet</h2><span class="phase-tag">Planned</span></div><p>Operate a controlled multi-node network using PQ-HotStuff with identity-backed validator rules and post-quantum signatures.</p><p class="detail">Exit gate: verified finality, safety, state-root agreement, restart and network-recovery testing.</p></div></article>
+<article class="phase"><div class="phase-index">3</div><div><div class="phase-head"><h2>Public Testnet Alpha</h2><span class="phase-tag">Planned · not authorized</span></div><p>Invite early users, developers and validator testers to try wallets, test transactions, public APIs and the Explorer under published participation rules.</p><p class="detail">Testnet tokens have no promised value. Testnet data and balances may be reset. Access policy will be announced before launch.</p></div></article>
+<article class="phase"><div class="phase-index">4</div><div><div class="phase-head"><h2>Public Testnet Beta</h2><span class="phase-tag">Planned</span></div><p>Broaden participation and test validator onboarding, proof-of-personhood, wallet recovery, governance and performance under realistic load.</p><p class="detail">Exit gate: published security, reliability and operational readiness criteria.</p></div></article>
+<article class="phase"><div class="phase-index">5</div><div><div class="phase-head"><h2>Mainnet Genesis</h2><span class="phase-tag">Future milestone</span></div><p>Launch the production sovereign network with approved validator, identity and monetary parameters, including the planned $QCB and $QRC roles.</p><p class="detail">Requires independent security review, finalized genesis configuration, operational readiness and explicit launch authorization. Features are only live when individually released.</p></div></article>
+<article class="phase"><div class="phase-index">6</div><div><div class="phase-head"><h2>Ecosystem Expansion</h2><span class="phase-tag">Long-term vision</span></div><p>Expand developer applications, merchant payments, Digital Identity Stone authorization, Charmed Agents and verified useful computation through PoCD.</p><p class="detail">Each capability has its own implementation and production acceptance gates; not all are expected at genesis.</p></div></article>
+</section>
+<section id="participate" class="panel" style="margin-top:16px"><h2>What participation could look like</h2><p class="note">Proposed capabilities; timing and eligibility depend on security and launch gates.</p><div class="table-scroll"><table class="roadmap-table"><thead><tr><th>Participant</th><th>Public Alpha</th><th>Public Beta</th><th>Mainnet</th></tr></thead><tbody>
+<tr><td>Users</td><td>Test wallets and transactions</td><td>Test identity, recovery and apps</td><td>Use supported production payments and wallets</td></tr>
+<tr><td>Validators</td><td>Onboard under testnet rules</td><td>Test reliability and participation</td><td>Validate under approved personhood and staking rules</td></tr>
+<tr><td>Developers</td><td>Try public APIs and Explorer</td><td>Build and stress-test apps</td><td>Deploy supported applications</td></tr>
+<tr><td>Compute contributors</td><td>Experimental access if ready</td><td>Test PoCD verification and rewards</td><td>Participate once PoCD production gates pass</td></tr>
+<tr><td>Merchants</td><td>Explore integrations</td><td>Pilot QRC payment flows</td><td>Accept QRC when infrastructure is released</td></tr>
+</tbody></table></div></section>
+<footer class="foot" style="margin-top:18px">Milestone-based roadmap · Last reviewed November 6, 2026. No launch dates, token prices, validator eligibility or economic returns are guaranteed. <a href="index.html">Back to live Explorer</a>.</footer>
+</main></div>
+</body></html>
